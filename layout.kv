@@ -1,5 +1,21 @@
 <Function>:
    Screen:
+      name: 'Landing'
+      MDTopAppBar:
+         title: 'QR Code Generator'
+         font_style: 'H5'
+         pos_hint: {"top":1}
+         specific_text_color: 0,0,0,1
+         elevation: 8
+
+
+      MDRectangleFlatButton:
+         text: 'Generate a new QR'
+         pos_hint: {'center_x': .5, 'center_y': .1}
+         on_release: root.current = 'first'
+
+
+   Screen:
       name:'first'
       MDTopAppBar:
          title: 'QR Code Generator'
@@ -16,20 +32,18 @@
             id:link_text
             hint_text: 'Enter your URL..'
 
-
       BoxLayout:
          size_hint_y: .1
          padding: "10dp"
          pos_hint: {'center_y':.55}
          MDTextField:
-            id:link_text2
+            id:image_name
             hint_text: 'Enter your image name..'
 
       MDRectangleFlatButton:
          text: 'Generate'
-         on_release: root.generate_qr_code(root)
          pos_hint: {'center_x': .3, 'center_y': .1}
-
+         on_release: root.generate_qr_code(root)
 
       MDRectangleFlatButton:
          text: 'View my QR code'
@@ -51,6 +65,5 @@
          font_style: 'H4'
          pos_hint: {'center_y':.9}
          halign: 'center'
-
 
 
