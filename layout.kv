@@ -48,7 +48,7 @@
       MDRectangleFlatButton:
          text: 'View my QR code'
          pos_hint: { 'center_x': .7, 'center_y':.1}
-         on_release: root.current = 'image'
+         on_release: root.view_image(root)
 
 
    Screen:
@@ -66,4 +66,8 @@
          pos_hint: {'center_y':.9}
          halign: 'center'
 
+      MDRectangleFlatButton:
+         text: 'go back'
+         pos_hint:{'center_x':.5,'center_y':.1}
+         on_release: root.go_back(root)
 
