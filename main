@@ -22,6 +22,14 @@ class Function(ScreenManager):
                title ="QR code generator", message="Please enter the image name/ URL"
            )
 
+    def view_image(self,root):
+        self.ids.img_.source = f"{self.ids.image_name.text}.png"
+        root.current = "image"
+    def go_back(self,root):
+        self.ids.link_text.text = ''
+        self.ids.image_name.text = ''
+        root.current = 'first'
+
 
 class Main(MDApp):
     Builder.load_file('layout.kv')
