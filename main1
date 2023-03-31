@@ -1,0 +1,61 @@
+from kivymd.app import MDApp
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.screenmanager import ScreenManager
+from kivy.lang import Builder
+from kivy.metrics import dp
+from kivy.properties import StringProperty
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineListItem
+import qrcode
+import mysql.connector
+import plyer
+from kivy.core.window import Window
+Window.size = 360,640
+
+class Function(ScreenManager,FloatLayout):
+    icon = StringProperty()
+    def dropdown(self):
+        menu_items =[
+            {
+                "viewclass" : "OneLineListItem",
+                "text" : "DOCUMENT",
+                "hieght" : dp(56),
+                "on_release" : lambda x="DOCUMENT": self.set_item(x),
+
+               },
+            {
+                "viewclass": "OneLineListItem",
+                "text": "DOCUMENT 1",
+                "hieght": dp(56),
+                "on_release": lambda x="DOCUMENT 1": self.set_item(x),
+
+            },
+            {
+                "viewclass": "OneLineListItem",
+                "text": "DOCUMENT 2",
+                "hieght": dp(56),
+                "on_release": lambda x="DOCUMENT 2": self.set_item(x),
+
+            }
+           ]
+        self.menu = MDDropdownMenu(
+            caller=self.ids.drop_item,
+            items=menu_items,
+            position="center",
+            width_mult=4
+
+           )
+        self.menu.bind()
+        self.menu.open()
+
+    def set_item(self,text_item):
+           self.screen.ids.drop_item.set_item(text_item)
+           self.menu.dismiss()
+
+
+class Main(MDApp):
+    Builder.load_file("layout.kv")
+    def build(self):
+         return Function()
+
+Main().run()
