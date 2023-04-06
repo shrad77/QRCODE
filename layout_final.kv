@@ -1,0 +1,40 @@
+<Function>:
+   Screen:
+      name: 'Landing'
+      MDTopAppBar:
+         title: 'QR Code Generator'
+         font_style: 'H5'
+         pos_hint: {"top":1}
+         specific_text_color: 0,0,0,1
+         elevation: 8
+
+
+      MDFillRoundFlatIconButton:
+         text: 'Generate a new QR'
+         pos_hint: {'center_x': .5, 'center_y': .1}
+         on_release : root.current = 'first'
+
+   Screen:
+      name: 'first'
+      MDTopAppBar:
+         title: 'QR Code Generator'
+         font_style: 'H5'
+         pos_hint: {"top":1}
+         specific_text_color: 0,0,0,1
+         elevation: 8
+
+      MDRoundFlatIconButton:
+         text: "Open manager"
+         icon: "folder"
+         pos_hint: {'center_x': .2, 'center_y': .6}
+         on_release: root.file_manager_open()
+
+      MDTextField:
+         id: drop_item
+         hint_text: "Enter product name"
+         icon_right: 'Dropdown.png'
+         pos_hint: {'center_x': .53, 'center_y': .7}
+
+
+
+
