@@ -253,29 +253,37 @@ class Function(ScreenManager,FloatLayout,BoxLayout):
            self.menu.dismiss()
 
     def file_chooser(self):
-        filechooser.open_file(on_selection=self.selected)
-
-    def selected(self, selection, file_name):
-        print('selection')
-
-        file_data = {
-            'name': ,
-            'path': self.file_path,
-
-
-        }
-        db_ref.push(file_data)
+        file_path = filechooser.open_file()
+        self.selected(file_path)
 
 
 
+    def selected(self, file_path_list):
+        file_path = file_path_list[0]
 
+        # Check that the file has a PDF extension
+        if not file_path.endswith('.pdf'):
+            print('Selected file is not a PDF')
+            return
 
+        # Convert the file path to a string
+        file_path_str = os.fspath(file_path)
 
+        # Create a database reference
+        ref = db.reference('ORDER ID')
 
-class Main(MDApp):
-    Builder.load_file('layout.kv')
-    def build(self):
-         return Function()
+        # Get a reference to the Firebase Storage bucket
+        bucket = storage.bucket()
 
+        # Upload the file to Firebase Storage
+        file_name = os.path.basename(file_path_str)
+        blob = bucket.blob(file_name)
+        with open(file_path_str, 'rb') as f:
+            blob.upload_from_file(f)
 
-Main().run()
+        # Save the download URL of the uploaded file to the Realtime Database
+        download_url = blob.generate_signed_url(timedelta(seconds=300), method='GET')
+        ref.push().set({
+            'file_name': file_name,
+            'download_url': download_url
+        })
