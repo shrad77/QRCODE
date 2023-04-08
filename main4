@@ -1,256 +1,79 @@
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.filechooser import FileChooserListView
+from datetime import timedelta
+import firebase as firebase
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager
 from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.properties import StringProperty
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.filemanager import MDFileManager
-from kivy.uix.modalview import ModalView
 from kivymd.toast import toast
 from kivy.factory import Factory
 import qrcode
-from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.factory import Factory
-from kivy.properties import ObjectProperty
-from kivy.uix.popup import Popup
 import os
 from plyer import filechooser
-
 from firebase_admin import credentials,initialize_app,storage,db
 from kivy.core.window import Window
+import firebase_admin
 Window.size = 360,640
 
-cred = credentials.Certificate("qrcode1-65ad3-b77226a23ba7.json")
-initialize_app(cred, {
-    'storageBucket': 'qrcode1-65ad3.appspot.com',
-    'databaseURL': 'https://qrcode1-65ad3-default-rtdb.firebaseio.com/'
-
+cred = credentials.Certificate("./venv/Scripts/qr-project-a2592-1a64216a7484.json")
+initialize_app(cred,{
+    'storageBucket':'qr-project-a2592.appspot.com',
+    'databaseURL': 'https://qr-project-a2592-default-rtdb.firebaseio.com/'
 })
 
 bucket = storage.bucket()
-db_ref = db.reference('files')
+db_ref = db.reference('ORDER ID')
 
 
-
-
-
-class Function(ScreenManager,FloatLayout,BoxLayout):
+class Function(ScreenManager,FloatLayout):
     icon = StringProperty()
-
-
-
     def dropdown(self):
-        menu_items =[
-            {
-                "viewclass" : "OneLineListItem",
-                "text" : "ZChek-PT Aerosol",
-                "hieght" : dp(56),
-                "on_release" : lambda x="ZChek-PT Aerosol": self.set_item(x),
+        blobs = bucket.list_blobs()
 
-               },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-PT",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-PT": self.set_item(x),
+        # Create a list of filenames
+        filenames = [blob.name for blob in blobs]
 
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-CR Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-CR": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Cl Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Cl Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-CH Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-CH Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-PTW Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-PTW Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-PTW",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-PTW": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-PH Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-PH Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-DL Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-DL Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Dl",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Dl": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-DH Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-DH Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-F9",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-F9": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "Zchek-F9W",
-                "hieght": dp(56),
-                "on_release": lambda x="Zchek-F9W": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-F18",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-F18": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-f18W",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-f18W": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-9 black",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-9 black": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-9E black Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-9E black Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "Zchek-WP Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="Zchek-WP Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-F18B",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-F18B": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Fp1",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Fp1": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Fp2 Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Fp2 Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Fp2",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Fp2": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Fp12 Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Fp12 Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-Fp12",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-Fp12": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "ZChek-D90G",
-                "hieght": dp(56),
-                "on_release": lambda x="ZChek-D90G": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "Zchek-9dred Aerosol",
-                "hieght": dp(56),
-                "on_release": lambda x="Zchek-9dred Aerosol": self.set_item(x),
-
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "801 cart oil",
-                "hieght": dp(56),
-                "on_release": lambda x="801 cart oil": self.set_item(x),
-
-            },
-
-
-
-           ]
-        self.menu = MDDropdownMenu(
-            caller=self.ids.drop_item,
-            items=menu_items,
-            position="center",
+        # Create the dropdown menu
+        dropdown_menu = MDDropdownMenu(
+            caller=self.ids.text_field,
+            items=[{"text": filename, "id": filename} for filename in filenames],
             width_mult=4
+        )
 
-           )
-        self.menu.bind()
-        self.menu.open()
+        # Bind the dropdown menu to the set_item function
+        dropdown_menu.bind(on_release=self.set_item)
 
-    def set_item(self,text_item):
-           self.screen.ids.drop_item.set_item(text_item)
-           self.menu.dismiss()
+        dropdown_menu.open()
+
+    def set_item(self, instance_menu, instance_menu_item):
+        # Set the text of the MDTextField to the selected item's text
+        self.root.ids.text_field.text = instance_menu_item.text
+
+        # Close the dropdown menu
+        instance_menu.dismiss()
+
+    def search_file(self):
+        # Get the name of the file to search for from the MDTextField
+        file_name = self.ids.text_field.text
+
+        # Search for the file in Firebase Storage
+        blob = bucket.blob(file_name)
+
+        # If the file is found, select it in the KivyMD app
+        if blob.exists():
+            self.ids.text_field.text = file_name
+        else:
+            # If the file is not found, display an error message
+            dialog = MDDialog(
+                title="Error",
+                text=f"File '{file_name}' not found.",
+                buttons=[MDFlatButton(text="OK", on_release=lambda x: dialog.dismiss())]
+            )
+            dialog.open()
 
     def file_chooser(self):
         file_path = filechooser.open_file()
@@ -287,3 +110,12 @@ class Function(ScreenManager,FloatLayout,BoxLayout):
             'file_name': file_name,
             'download_url': download_url
         })
+
+
+
+class Main(MDApp):
+    Builder.load_file("layout.kv")
+    def build(self):
+         return Function()
+
+Main().run()
