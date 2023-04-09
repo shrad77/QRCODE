@@ -1,0 +1,2 @@
+<MyDropdownItem@MDFlatButton>:
+    on_release: app.retrieve_files(self)
