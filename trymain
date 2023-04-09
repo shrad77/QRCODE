@@ -1,0 +1,70 @@
+import firebase_admin
+import os
+import webbrowser
+from firebase_admin import credentials
+from firebase_admin import db
+from kivy.lang import Builder
+from kivy.network.urlrequest import UrlRequest
+from kivy.properties import ObjectProperty
+from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
+from kivymd.app import MDApp
+from kivymd.uix.button import MDRaisedButton, MDFlatButton
+from kivymd.uix.menu import MDDropdownMenu
+
+cred = credentials.Certificate("pythonproject10-248b9-4b5c4caf5cbb.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://pythonproject10-248b9-default-rtdb.firebaseio.com/'
+
+})
+
+
+# Define the dropdown item
+class MyDropdownItem(MDFlatButton):
+    pass
+
+class MyApp(MDApp):
+    Builder.load_file('layput.kv')
+    files_dropdown = ObjectProperty()
+
+    def build(self):
+        self.theme_cls.primary_palette = "Blue"
+        self.files_dropdown = DropDown()
+
+        # Create the dropdown button
+        dropdown_btn = MDRaisedButton(text="Files", on_release=self.retrieve_files)
+
+        # Add the dropdown items to the dropdown menu
+        self.files_dropdown.add_widget(MyDropdownItem(text="Loading..."))
+
+        return dropdown_btn
+
+    # Callback to retrieve files from Firebase database
+    def retrieve_files(self, button):
+        # Clear the existing dropdown items
+        self.files_dropdown.clear_widgets()
+
+        # Retrieve files from the Firebase database
+        files_ref = db.reference('files')
+        files = files_ref.get()
+
+        if files is None:
+            # If no files were retrieved, show an error message
+            error_msg = "No files found in database"
+            print(error_msg)
+            self.files_dropdown.add_widget(MyDropdownItem(text=error_msg))
+        else:
+            # Add each file as a dropdown item
+            for file_name, file_data in files.items():
+                if 'url' in file_data:
+                    file_url = file_data['url']
+                    dropdown_item = MyDropdownItem(text=file_name)
+                    dropdown_item.bind(on_release=lambda item, url=file_url: os.startfile(url))
+                    self.files_dropdown.add_widget(dropdown_item)
+                else:
+                    print(f"No URL found for file '{file_name}'")
+
+            # Attach the dropdown menu to the button and open it
+            self.files_dropdown.attach_to(button)
+            self.files_dropdown.open(button)
+MyApp().run()
