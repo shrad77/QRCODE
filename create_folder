@@ -1,0 +1,51 @@
+# Import the required libraries
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+
+# Initialize the Firebase Admin SDK
+cred = credentials.Certificate("path/to/serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://your-project-id.firebaseio.com/'
+})
+
+# Create a Kivy app with a box layout
+class MyApp(App):
+    def build(self):
+        layout = BoxLayout(orientation='vertical')
+        self.folder_name_label = TextInput(text='Enter folder name')
+        layout.add_widget(self.folder_name_label)
+        self.create_button = Button(text='Create Folder')
+        self.create_button.bind(on_press=self.create_folder)
+        layout.add_widget(self.create_button)
+        self.status_label = Label(text='')
+        layout.add_widget(self.status_label)
+        return layout
+
+    # Create a function to create a new folder
+    def create_folder(self, event):
+        # Get the folder name from the text input widget
+        folder_name = self.folder_name_label.text
+
+        # Create a reference to the new folder
+        folder_ref = db.reference(folder_name)
+
+        # Set some data in the new folder
+        folder_ref.set({
+            'key1': 'value1',
+            'key2': 'value2'
+        })
+
+        # Get the URL for the new folder
+        folder_url = folder_ref.get_url()
+
+        # Update the status label with the URL
+        self.status_label.text = "Folder URL: " + folder_url
+
+# Run the Kivy app
+MyApp().run()
